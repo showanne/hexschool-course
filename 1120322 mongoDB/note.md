@@ -2,6 +2,7 @@
 ###### tags: `Node.js 企業專題班`
 講義：[第一週 mongoDB 資料庫教學](https://hackmd.io/S2GgzEBmQ5Gm2ziKnWpRog?view)
 作業：[第一週主線任務](https://hackmd.io/@hexschool/HJOX15NZ9)
+作業繳交：[第一週主線任務 - Anne](https://hackmd.io/b8PRtxA9T2eOOFkKV0JlMA)
 
 * mongoDB 安裝路徑：`C:\Program Files\MongoDB\Server\6.0\`
 * 資料存放路徑：`C:\Program Files\MongoDB\Server\6.0\data\`
