@@ -1,0 +1,15 @@
+{
+  "name": "api-todolist",
+  "version": "1.0.0",
+  "description": "hexschool course nodejs 2023 - todolist api ",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Anne",
+  "license": "ISC",
+  "dependencies": {
+    "uuid": "^9.0.0"
+  }
+}
