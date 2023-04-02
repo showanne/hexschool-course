@@ -253,3 +253,6 @@ console.log(data)
   comments: 250
 }
 ```
+
+### 助教補充層級觀念
+![](https://i.imgur.com/eg45YMn.png)
