@@ -149,6 +149,7 @@ db.posts.find({"comments":{$gte:500}})
 ```
 13. 查詢 `tags`  欄位，有 `謎因` **或(or)** `幹話` 的 document 列表
 ``` json
+// 方法1
 db.posts.find(
     {$or:
         [
@@ -157,6 +158,10 @@ db.posts.find(
         ]
     }
 )
+// 方法2
+db.posts.find({
+    "tags":{$in:["謎因", "幹話"]}
+})
 ```
 14. 查詢 `tags`  欄位，有 `幹話` 的 document 列表，需隱藏 `_id` 欄位
 ``` json
@@ -179,7 +184,10 @@ db.posts.find(
 ```
 15. 請嘗試用 Mongo Shell 指令刪除全部 Documents
 ``` json
+// 方法1
 db.posts.deleteMany({})
+// 方法2
+db.posts.drop()
 // feedback
 { acknowledged: true, deletedCount: 202 }
 ```
@@ -239,8 +247,12 @@ db.posts.find(
 )
 ```
 8. 查詢 `image` 欄位為 `null` 的 document 列表
+    ##### 查詢型別type [$type](https://www.mongodb.com/docs/manual/reference/operator/query/type/)
 ``` json
+// 方法1
 db.posts.find({"image":null})
+// 方法2
+db.posts.find({"image": {$type: 10}}) // type 10 = null
 ```
 
 9. 隨意找一筆 document 資料，將 `tags` 欄位裡的陣列，新增一個新 tags 為 `遊記`
@@ -248,9 +260,17 @@ db.posts.find({"image":null})
 // step.1 驗證
 db.posts.find({"tags":{$in:["遊記"]}}).count() // 0
 // step.2 執行新增
+// 方法1
 db.posts.updateOne(
    { "_id": ObjectId("6429459b53474e6ed5cd1440") },
    { $push: { "tags": '遊記' } }
+)
+// 方法2
+db.posts.updateOne(
+    { "_id": ObjectId("6429459b53474e6ed5cd1440") },
+    { $addToSet: 
+        { "tags": '遊記' }
+    }
 )
 // feedback
 {
@@ -262,6 +282,33 @@ db.posts.updateOne(
 }
 // step.3 再次驗證
 db.posts.find({"tags":{$in:["遊記"]}}).count() // 1
+```
+##### 隨機的寫法 [$sample](https://www.mongodb.com/docs/manual/reference/operator/aggregation/sample/)
+``` json
+// step.1 新隨便找一筆
+let data = db.posts.aggregate(
+   [ { $sample: { size: 1 } } ]
+).next()
+// step.2 將這筆更新
+db.posts.updateOne(
+    { "_id": data._id },
+    { $push: { "tags": '遊記' } }
+)
+// step.3 驗證
+// console.log(data) // 不能直接看 data ，因為 data 已經存成變數，所以要重新用 id 搜尋 再叫出資料
+db.posts.find({"_id": data._id})
+// feedback
+{
+  _id: ObjectId("6429459b53474e6ed5cd1695"),
+  name: 'Rorke Andres',
+  tags: [ '電影', '謎因', '遊記' ],
+  type: 'friend',
+  image: 'http://dummyimage.com/247x100.png/cc0000/ffffff',
+  createdAt: '2022-03-19 13:32:45 UTC',
+  content: 'dui luctus rutrum nulla tellus in sagittis dui vel nisl duis ac nibh fusce lacus purus aliquet at feugiat non pretium quis lectus suspendisse potenti in eleifend quam a odio in hac habitasse platea dictumst maecenas ut massa quis augue luctus tincidunt nulla mollis molestie lorem quisque ut erat curabitur gravida nisi at',
+  likes: 1705,
+  comments: 250
+}
 ```
 
 10. 將所有 `tags` 陣列裡的 `感情` 都移除

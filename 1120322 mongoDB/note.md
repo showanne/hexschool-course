@@ -90,8 +90,9 @@
     ```
 
 ### `.find()` 搜尋指令
-* `.find()` 一般搜尋 = 顯示該資料庫的所有資料
+* `.find({})` 一般搜尋 = 顯示該資料庫的所有資料
 * `.find().pretty()` 將顯示的資料排成好看的格式
+* `.findOne({})` 搜尋符合條件的其中一筆
 
 * 尋找對應屬性：`db.collections.find({屬性名稱:屬性值})`
     ```json
@@ -123,6 +124,20 @@
       { name: '三人房', price: 7000 },
       { name: '豪華單人房', price: 1500 }
     ]
+    ```
+* 指定只顯示某些欄位：`db.collections.find({屬性:{條件}},{屬性:1})`
+   ```json
+    db.posts.find(
+        {"name": "Ray Xu"},
+        {"name":1, "tags":1}
+    )
+    // 輸出結果為
+    {
+        _id: ObjectId("6429459b53474e6ed5cd15da"),
+        name: 'Ray Xu',
+        tags: ['謎因','電影']
+    }
+    ...
     ```
 * 搜尋陣列裡的字串值：`db.collections.find({"屬性":{$in:["關鍵字"]}})`
     ```json
@@ -186,7 +201,7 @@
     // 將所有 `tags` 陣列裡的 `感情` 都移除
     db.posts.updateMany({}, {$pull: {"tags": "感情"}})
     ```
-* `$push` 用於修改陣列（Array）的更新操作，可以將一個元素添加到陣列的尾部
+* `$push` 用於修改陣列（Array）的更新操作，可以將一個元素添加到陣列的尾部，會有重複添加元素的問題。
     ##### `{ $push: { <field>: <value> } }`
     ```json
     // 找一筆資料，將 tags 陣列新增一個新 tags 為 `遊記`
@@ -195,3 +210,46 @@
        { $push: { "tags": '遊記' } }
     )
     ```
+* `$addToSet` 向陣列欄位中添加元素，並避免了重複添加相同的元素的問題。
+    ##### `db.collection.updateOne(<filter>,{ $addToSet: { <field>: <value> } }`
+    ```json
+    // 找一筆資料，將 tags 陣列新增一個新 tags 為 `遊記`
+    db.posts.updateOne(
+       { "_id": ObjectId("6429459b53474e6ed5cd1440") },
+       { $addToSet: 
+           { "tags": '遊記' }
+       }
+    )
+    ```
+* `drop()` 刪除一個集合（Collection）或資料庫（Database），此操作是永久性的
+    ```json
+    // 刪除全部 Documents
+    db.posts.drop()
+    ```
+
+* 隨機 [$sample](https://www.mongodb.com/docs/manual/reference/operator/aggregation/sample/)
+``` json
+// step.1 新隨便找一筆
+let data = db.posts.aggregate(
+   [ { $sample: { size: 1 } } ]
+).next()
+// step.2 將這筆更新
+db.posts.updateOne(
+    { "_id": data._id },
+    { $push: { "tags": '遊記' } }
+)
+// step.3 驗證
+console.log(data)
+// feedback
+{
+  _id: ObjectId("6429459b53474e6ed5cd1695"),
+  name: 'Rorke Andres',
+  tags: [ '電影', '謎因' ],
+  type: 'friend',
+  image: 'http://dummyimage.com/247x100.png/cc0000/ffffff',
+  createdAt: '2022-03-19 13:32:45 UTC',
+  content: 'dui luctus rutrum nulla tellus in sagittis dui vel nisl duis ac nibh fusce lacus purus aliquet at feugiat non pretium quis lectus suspendisse potenti in eleifend quam a odio in hac habitasse platea dictumst maecenas ut massa quis augue luctus tincidunt nulla mollis molestie lorem quisque ut erat curabitur gravida nisi at',
+  likes: 1705,
+  comments: 250
+}
+```
