@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan'); // 日誌 log
 
 const mongoose = require('mongoose'); // 資料庫設定
-mongoose.connect('mongodb://localhost:27017/DB-1120329')
+mongoose.connect('mongodb://localhost:27017/DB-1120331')
     .then(res=> console.log("連線資料成功"));
 
 const indexRouter = require('./routes/index');
